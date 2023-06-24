@@ -1,11 +1,15 @@
+# Imports
 import os
 import shutil
-from PIL import Image
 import glob
+from PIL import Image
 
-new_extension = '.zip'
-folder_path = r"C:\Users\sanja\Downloads\Compress"
+# Variables
+zip = '.zip'
+epub = '.epub'
+folder_path = r"B:\Github\EPUB-Compressor\Compress"
 
+# Functions
 def find_file(folder_path, target_extension):
     # Get a list of files in the folder
     files = os.listdir(folder_path)
@@ -32,6 +36,7 @@ def change_file_type(file_path, new_extension):
     # Rename the file to the new file path
     shutil.move(file_path, new_file_path)
 
+
 def unpack_archive(archive_path):
     # Get the folder name from the archive path
     folder_name = os.path.splitext(os.path.basename(archive_path))[0]
@@ -47,6 +52,7 @@ def unpack_archive(archive_path):
 
 
 def find_subfolder_path(folder_path, subfolder_name):
+    # Find a given folder path by folder name
     subfolder_path = None
     for path in glob.glob(os.path.join(folder_path, '**', subfolder_name), recursive=True):
         if os.path.isdir(path):
@@ -56,15 +62,7 @@ def find_subfolder_path(folder_path, subfolder_name):
     return subfolder_path
 
 
-
-pth = find_file(folder_path,'.epub')
-print(pth)
-change_file_type(pth,'.zip')
-pthN = find_file(folder_path,'.zip')
-newpth = unpack_archive(pthN)
-imgpth = find_subfolder_path(newpth,"Images")
-
-def compress_images(folder_path, quality=80):
+def compress_images(folder_path, quality=50):
     # Iterate over all files in the folder
     for filename in os.listdir(folder_path):
         file_path = os.path.join(folder_path, filename)
@@ -79,10 +77,8 @@ def compress_images(folder_path, quality=80):
 
             # Close the image
             img.close()
-            print("compressed")
 
-# Usage example
-compress_images(imgpth, quality=85)
+
 def compress_folder_to_zip(folder_path):
     # Get the parent directory of the folder
     parent_dir = os.path.dirname(folder_path)
@@ -95,14 +91,32 @@ def compress_folder_to_zip(folder_path):
 
     # Compress the folder to a ZIP file
     shutil.make_archive(zip_file_path, 'zip', folder_path)
-    print("compressed")
-
     return zip_file_path
-zipp = compress_folder_to_zip(newpth)
-shutil.rmtree(zipp)
-change_file_type(zipp+".zip",'.epub')
 
 
+def main(fpath,zip,epub):
+    # Find file and change type to Zip
+    main_path = find_file(fpath,epub)
+    change_file_type(main_path,zip)
+    change_path = find_file(fpath,zip)
+
+    # Handle archive and find image folder
+    arch_path = unpack_archive(change_path)
+    img_path = find_subfolder_path(arch_path,"Images")
+
+    # Compress images
+    compress_images(img_path, quality=50)
+
+    # Conversion back to Epub
+    zip_path = compress_folder_to_zip(arch_path)
+    shutil.rmtree(zip_path)
+    change_file_type(zip_path+".zip",epub)
 
 
-
+# Main Code
+try:
+    main(folder_path,zip,epub)
+except Exception as e:
+    print("File Error")
+else:
+    print("File Compressed")
