@@ -21,8 +21,8 @@ def find_file(folder_path, target_extension):
         # Check if the file matches the target extension
         if os.path.isfile(file_path) and filename.lower().endswith(target_extension.lower()):
             return file_path
-        else:
-            return 0
+    
+    return 0
 
 
 def change_file_type(file_path, new_extension):
@@ -118,5 +118,6 @@ try:
     main(folder_path,zip,epub)
 except Exception as e:
     print("File Error")
+    print(e)
 else:
     print("File Compressed")
